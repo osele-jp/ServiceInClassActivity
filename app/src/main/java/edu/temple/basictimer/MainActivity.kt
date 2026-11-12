@@ -6,6 +6,8 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Lifecycle
@@ -67,4 +69,46 @@ class MainActivity : AppCompatActivity() {
             timerBinder?.stop()
         }
     }
+    private var myMenu : Menu? = null
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        menuInflater.inflate(R.menu.main, menu)
+        myMenu = menu
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId){
+
+            R.id.action_start_timer -> {
+                startTimer()
+            }
+            R.id.action_stop_timer -> stopTimer()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun startTimer(){
+        timerBinder?.run{
+            //NTS: Can be optomized by using a ViewModel
+            if(!isRunning){
+                timerBinder?.start(100)
+                findViewById<Button>(R.id.startButton).text = "PAUSE"
+                myMenu?.findItem(R.id.action_start_timer)?.setIcon(android.R.drawable.ic_media_pause)
+
+            }else if (isRunning){
+                timerBinder?.pause()
+                findViewById<Button>(R.id.startButton).text = "RESUME"
+                myMenu?.findItem(R.id.action_start_timer)?.setIcon(android.R.drawable.ic_media_play)
+            }
+        }
+    }
+
+    fun stopTimer(){
+        timerBinder?.stop()
+        myMenu?.findItem(R.id.action_start_timer)?.setIcon(android.R.drawable.ic_media_play)
+    }
+
 }
